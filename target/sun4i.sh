@@ -12,27 +12,11 @@ cat > output/target/etc/init.d/rcS << EOF
 mount -t devtmpfs none /dev
 mkdir /dev/pts
 mount -t devpts none /dev/pts
-
-mknod /dev/mali c 230 0
-hostname sun4i
-mkdir -p /boot
-mount /dev/nanda /boot
-MODULES_DIR=/lib/modules/\`uname -r\`
-(cd \$MODULES_DIR;insmod disp.ko;insmod lcd.ko;insmod hdmi.ko)
-
+hostname cubieboard 
+/test/load.sh
 
 EOF
 
-sed -i '/TSLIB/d' output/target/etc/profile
-
-echo "export TSLIB_TSEVENTTYPE=H3600" >> output/target/etc/profile
-echo "export TSLIB_CONSOLEDEVICE=none" >> output/target/etc/profile
-echo "export TSLIB_FBDEVICE=/dev/fb0" >> output/target/etc/profile
-echo "export TSLIB_TSDEVICE=/dev/input/event2" >> output/target/etc/profile
-echo "export TSLIB_CALIBFILE=/etc/pointercal" >> output/target/etc/profile
-echo "export TSLIB_CONFFILE=/etc/ts.conf" >> output/target/etc/profile
-echo "export TSLIB_PLUGINDIR=/usr/lib/ts" >> output/target/etc/profile
-echo "" >> output/target/etc/profile
 
 touch output/target/etc/init.d/auto_config_network
 
