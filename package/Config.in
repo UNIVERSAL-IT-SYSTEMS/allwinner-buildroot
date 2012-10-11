@@ -516,6 +516,7 @@ source "package/tiobench/Config.in"
 source "package/fsck_msdos/Config.in"
 source "package/mali-3d/Config.in"
 source "package/mali-3d-r2p3/Config.in"
+source "package/mali-3d-r2p4/Config.in"
 source "package/cedar/Config.in"
 endmenu
 
