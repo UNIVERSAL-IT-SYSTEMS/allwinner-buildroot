@@ -12,7 +12,7 @@ cat > output/target/etc/init.d/rcS << EOF
 mount -t devtmpfs none /dev
 mkdir /dev/pts
 mount -t devpts none /dev/pts
-hostname cubieboard 
+hostname cubieboard
 /test/load.sh
 
 EOF
@@ -27,8 +27,7 @@ MAC_ADDR="\`uuidgen |awk -F- '{print \$5}'|sed 's/../&:/g'|sed 's/\(.\)$//' |cut
 
 ifconfig eth0 hw ether "48\$MAC_ADDR"
 ifconfig lo 127.0.0.1
-udhcpc
-
+udhcpc -n -T 1 -t 3
 EOF
 
 chmod +x output/target/etc/init.d/auto_config_network
