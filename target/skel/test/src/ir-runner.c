@@ -4,6 +4,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #include <pthread.h>
 #include <sys/types.h>
@@ -194,11 +195,27 @@ int main (int argc, char **argv)
 	char name[256] = "Unknown";
 	int abs[5];
 
+	pid_t pid, sid;
+
 	if (argc < 2) {
 		printf("Usage: ir-runner /dev/input/eventX\n");
 		printf("Where X = input device number\n");
 		return 1;
 	}
+
+	pid = fork();
+	if (pid < 0) {
+		exit(EXIT_FAILURE);
+	}
+	if (pid >0) {
+		exit(EXIT_SUCCESS);
+	}
+	umask(0);
+	sid = setsid();
+	if (sid < 0) {
+		exit(EXIT_FAILURE);
+	}
+
 
 	if ((fd = open(argv[argc - 1], O_RDONLY)) < 0) {
 		perror("evtest");
