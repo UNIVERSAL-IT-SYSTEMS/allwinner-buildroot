@@ -20,23 +20,23 @@ do
         mmc_flag="ok"
 done
 
-infow 1 0 '[IR    ]' ok
+infow 2 0 '          [IR][HongWai]        ' ok
 
 if [ "$ata_flag" = "ok" ]; then
-        infow 2 0 '[SATA  ]' ok
+	    infow 3 0 '          [SATA][YingPan]      ' ok
 else
-        infow 2 1 '[SATA  ]' no
+	    infow 3 1 '          [SATA][YingPan]      ' no
 fi
 
 
 if [ "$udisk_flag" = "ok" ]; then
-        infow 3 0 '[UDISK ]' ok              
+	    infow 4 0 '          [USB][U Pan]         ' ok
 else                                    
-        infow 3 1 '[UDISK ]' no             
+	    infow 4 1 '          [USB][U Pan]         ' no
 fi
 
 if [ "$mmc_flag" = "ok" ]; then
-        infow 4 0 '[MMC   ]' ok
+	    infow 5 0 '          [SDCARD][SD Ka]      ' ok
 else
-        infow 4 1 '[MMC   ]' no
+	    infow 5 1 '          [SDCARD][SD Ka]      ' no
 fi

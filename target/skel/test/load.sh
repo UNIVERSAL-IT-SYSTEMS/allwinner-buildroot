@@ -18,3 +18,12 @@ for item in $(ls /sys/class/input); do
         ;;
     esac
 done
+
+
+rm /dev/snd/pcmC0D0p /dev/snd/pcmC1D0p                                                                
+mknod /dev/snd/pcmC0D0p c 116 48
+mknod /dev/snd/pcmC1D0p c 116 16
+/bin/CedarXPlayerTest /test/Logo.m4v 1>/dev/null
+rm /dev/snd/pcmC0D0p /dev/snd/pcmC1D0p
+mknod /dev/snd/pcmC0D0p c 116 16
+mknod /dev/snd/pcmC1D0p c 116 48
