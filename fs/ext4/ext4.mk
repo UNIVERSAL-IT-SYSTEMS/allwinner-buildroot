@@ -22,6 +22,7 @@ ROOTFS_EXT4_DEPENDENCIES = host-genext2fs
 
 define ROOTFS_EXT4_CMD
 	PATH=$(TARGET_PATH) fs/ext4/genext2fs.sh -d $(TARGET_DIR) $(EXT4_OPTS) $$@ ; \
+	export PATH=$(PATH):/sbin ; \
 	tune2fs -j -O extents,uninit_bg,dir_index $$@ ; \
 	fsck.ext4 -y $$@ ; \
 	echo $(TARGETS) ; \
