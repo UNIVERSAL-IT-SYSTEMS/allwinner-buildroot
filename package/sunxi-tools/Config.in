@@ -1,0 +1,4 @@
+config BR2_PACKAGE_SUNXI_TOOLS
+       bool "sunxi tools"
+       help
+         sunxi-tools from open community

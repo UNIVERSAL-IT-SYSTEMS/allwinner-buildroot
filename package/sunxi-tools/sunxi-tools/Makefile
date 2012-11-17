@@ -1,0 +1,80 @@
+CC = $(CROSS_COMPILE)gcc
+CFLAGS = -g -O0 -Wall -Wextra
+CFLAGS += -std=c99 -D_POSIX_C_SOURCE=200112L
+CFLAGS += -Iinclude/
+
+TOOLS = fexc bin2fex fex2bin 
+TOOLS += nand-part
+
+MISC_TOOLS = phoenix_info
+
+.PHONY: all clean
+
+all: $(TOOLS)
+
+misc: $(MISC_TOOLS)
+
+clean:
+	@rm -vf $(TOOLS) $(MISC_TOOLS) *.o *.elf *.sunxi *.bin *.nm *.orig
+
+
+$(TOOLS): Makefile common.h
+
+fex2bin bin2fex: fexc
+	ln -s $< $@
+
+fexc: fexc.h script.h script.c \
+	script_bin.h script_bin.c \
+	script_fex.h script_fex.c
+
+LIBUSB = usb
+LIBUSB_CFLAGS = `pkg-config --cflags $(LIBUSB)`
+LIBUSB_LIBS = `pkg-config --libs $(LIBUSB)`
+
+fel: fel.c
+	$(CC) $(CFLAGS) $(LIBUSB_CFLAGS) $(LDFLAGS) -o $@ $(filter %.c,$^) $(LIBS) $(LIBUSB_LIBS)
+
+%: %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(filter %.c,$^) $(LIBS)
+
+fel-pio.bin: fel-pio.elf fel-pio.nm
+	$(CROSS_COMPILE)objcopy -O binary fel-pio.elf fel-pio.bin
+
+fel-pio.elf: fel-pio.c fel-pio.lds
+	$(CROSS_COMPILE)gcc  -g  -Os -fpic  -fno-common -fno-builtin -ffreestanding -nostdinc -mno-thumb-interwork -Wall -Wstrict-prototypes -fno-stack-protector -Wno-format-nonliteral -Wno-format-security -fno-toplevel-reorder  fel-pio.c -nostdlib -o fel-pio.elf -T fel-pio.lds
+
+fel-pio.nm: fel-pio.elf
+	$(CROSS_COMPILE)nm fel-pio.elf | grep -v " _" >fel-pio.nm
+
+jtag-loop.elf: jtag-loop.c jtag-loop.lds
+	$(CROSS_COMPILE)gcc  -g  -Os  -fpic -fno-common -fno-builtin -ffreestanding -nostdinc -mno-thumb-interwork -Wall -Wstrict-prototypes -fno-stack-protector -Wno-format-nonliteral -Wno-format-security -fno-toplevel-reorder  jtag-loop.c -nostdlib -o jtag-loop.elf -T jtag-loop.lds -Wl,-N
+
+jtag-loop.bin: jtag-loop.elf
+	$(CROSS_COMPILE)objcopy -O binary jtag-loop.elf jtag-loop.bin
+
+jtag-loop.sunxi: jtag-loop.bin
+	mksunxiboot jtag-loop.bin jtag-loop.sunxi
+
+fel-boot.elf: fel-boot.c fel-boot.lds
+	$(CROSS_COMPILE)gcc  -g  -Os  -fpic -fno-common -fno-builtin -ffreestanding -nostdinc -mno-thumb-interwork -Wall -Wstrict-prototypes -fno-stack-protector -Wno-format-nonliteral -Wno-format-security -fno-toplevel-reorder  fel-boot.c -nostdlib -o fel-boot.elf -T fel-boot.lds -Wl,-N
+
+fel-boot.bin: fel-boot.elf
+	$(CROSS_COMPILE)objcopy -O binary fel-boot.elf fel-boot.bin
+
+fel-boot.sunxi: fel-boot.bin
+	mksunxiboot fel-boot.bin fel-boot.sunxi
+
+bootinfo: bootinfo.c
+
+.gitignore: Makefile
+	@for x in $(TOOLS) '*.o' '*.swp'; do \
+		echo "$$x"; \
+	done > $@
+
+install:
+	echo "install to $(DESTDIR)"
+	install fexc $(DESTDIR)/bin
+	install bin2fex $(DESTDIR)/bin
+	install fex2bin $(DESTDIR)/bin
+	install nand-part $(DESTDIR)/bin
+
