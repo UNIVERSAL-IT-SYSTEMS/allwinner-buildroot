@@ -1,36 +1,22 @@
 #!/bin/sh
 
-#rm -rf output/target/etc/init.d/S*
+MY_TARGET_DIR=$1
 
-rm -rf output/target/init
-(cd output/target && ln -s bin/busybox init)
+cp -r target/skel/* ${MY_TARGET_DIR}/
+
+rm -rf ${MY_TARGET_DIR}/init
+(cd ${MY_TARGET_DIR} && ln -s bin/busybox init)
 
 
-cat > output/target/etc/init.d/rcS << EOF
+cat > ${MY_TARGET_DIR}/etc/init.d/rcS << EOF
 #!/bin/sh
 
 mount -t devtmpfs none /dev
 mkdir /dev/pts
 mount -t devpts none /dev/pts
-hostname cubieboard
-/test/load.sh
+mknod /dev/mali c 230 0
+hostname cubiebox
+mkdir -p /boot
 
 EOF
-
-
-touch output/target/etc/init.d/auto_config_network
-
-cat > output/target/etc/init.d/auto_config_network << EOF
-#!/bin/sh
-
-MAC_ADDR="\`uuidgen |awk -F- '{print \$5}'|sed 's/../&:/g'|sed 's/\(.\)$//' |cut -b3-17\`"
-
-ifconfig eth0 hw ether "48\$MAC_ADDR"
-ifconfig lo 127.0.0.1
-udhcpc -n -T 1 -t 3
-EOF
-
-chmod +x output/target/etc/init.d/auto_config_network
-(cd target/skel/ && tar -c *) |tar -C output/target/ -xv
-
 
